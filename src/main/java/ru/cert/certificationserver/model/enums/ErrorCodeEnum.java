@@ -1,0 +1,14 @@
+package ru.cert.certificationserver.model.enums;
+
+public enum ErrorCodeEnum {
+  NOT_FOUND,
+  BAD_REQUEST,
+  METHOD_NOT_ALLOWED,
+  INTERNAL_SERVER_ERROR,
+  VALIDATION_FAILED,
+  UNAUTHORIZED,
+  FORBIDDEN,
+  CONFLICT,
+  CONTENT_TOO_LARGE,
+  REQUEST_HEADER_FIELDS_TOO_LARGE
+}

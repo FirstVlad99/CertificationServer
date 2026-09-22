@@ -1,0 +1,19 @@
+post:
+  operationId: logout
+  summary: Выход из системы (логаут)
+  description:
+    Инвалидирует сессию на бэкенде.
+    Клиент обязан самостоятельно удалить access и refresh токены.
+  tags:
+    - auth
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../components/schemas.yaml#/schemas/LogoutMobileRequest'
+  responses:
+    '204':
+      description: Успешный выход. Refresh токен удален на backend.
+    '401':
+      $ref: '../../../components/responses.yaml#/UnauthorizedError'
