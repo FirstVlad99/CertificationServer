@@ -1,0 +1,22 @@
+post:
+  operationId: refreshTokens
+  summary: Обновление токенов
+  description: |
+    Бэкенд получает старый `refresh_token` из тела запроса,
+    валидирует его и отдает пару (`access_token` и `refresh_token`).
+  tags:
+    - auth
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../components/schemas.yaml#/schemas/RefreshMobileRequest'
+  responses:
+    '200':
+      description: Токены успешно обновлены в куках.
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas.yaml#/schemas/TokensMobileResponse'

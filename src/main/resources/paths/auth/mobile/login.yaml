@@ -1,0 +1,25 @@
+post:
+  operationId: login
+  summary: Вход в систему (логин)
+  description: |
+    Аутентифицирует пользователя под заданной в запросе ролью. Бэкенд генерирует и возвращает access и refresh токены.
+  tags:
+    - auth
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../components/schemas.yaml#/schemas/LoginRequest'
+  responses:
+    '200':
+      description: Успешный вход. Токены переданы в теле ответа.
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas.yaml#/schemas/TokensMobileResponse'
+    '401':
+      $ref: '../../../components/responses.yaml#/UnauthorizedError'
+    '422':
+      $ref: '../../../components/responses.yaml#/BadRequestError'

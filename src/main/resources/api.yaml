@@ -1,0 +1,22 @@
+openapi: 3.0.3
+info:
+  title: API для CertificationAPP PetrSU
+  version: 1.0.0
+servers:
+  - url: /api/v1
+
+security:
+  - CookieAuth: []
+
+paths:
+  /auth/mobile/register:
+    $ref: './paths/auth/mobile/register.yaml'
+
+  /auth/mobile/login:
+    $ref: './paths/auth/mobile/login.yaml'
+
+  /auth/mobile/logout:
+    $ref: './paths/auth/mobile/logout.yaml'
+
+  /auth/mobile/refresh:
+    $ref: './paths/auth/mobile/refresh.yaml'
