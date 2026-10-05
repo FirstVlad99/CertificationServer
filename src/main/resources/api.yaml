@@ -20,3 +20,23 @@ paths:
 
   /auth/mobile/refresh:
     $ref: './paths/auth/mobile/refresh.yaml'
+
+  /auth/mobile/activate:
+    $ref: './paths/auth/mobile/activate.yaml'
+
+  /auth/mobile/activate/verify:
+    $ref: './paths/auth/mobile/activate_verify.yaml'
+
+  /auth/mobile/activate/resend:
+    $ref: './paths/auth/mobile/resend_activation.yaml'
+
+  /auth/mobile/reset-password:
+    $ref: './paths/auth/mobile/reset_password.yaml'
+
+  /auth/mobile/forgot-password:
+    $ref: './paths/auth/mobile/forgot_password.yaml'
+
+  /auth/mobile/reset-password/verify:
+    $ref: './paths/auth/mobile/reset_password_verify.yaml'
+
+

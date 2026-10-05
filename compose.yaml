@@ -30,6 +30,30 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+  kafka:
+    image: apache/kafka:4.3.0
+    container_name: cert_kafka
+    restart: always
+    ports:
+      - "${KAFKA_PORT:-9092}:9092"
+      - "${KAFKA_HOST_PORT:-9094}:9094"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: BROKER://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,HOST://0.0.0.0:9094 # внутренний слушатель для связи брокеров между собой, слушатель для связи контроллеров в кворуме, слушатель для подключения приложения с хоста
+      KAFKA_ADVERTISED_LISTENERS: BROKER://kafka:9092,HOST://localhost:9094 # адреса, раздаваемые клиентам для подключения; для внутренних компонентов docker (service в другом контейнере); для подключения с хоста (локально)
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: BROKER:SASL_PLAINTEXT,CONTROLLER:PLAINTEXT,HOST:SASL_PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      KAFKA_LISTENER_NAME_BROKER_PLAIN_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_ADMIN_USERNAME:-admin}" password="${KAFKA_ADMIN_PASSWORD:-admin}" user_${KAFKA_ADMIN_USERNAME:-admin}="${KAFKA_ADMIN_PASSWORD:-admin}"; # для слушателя брокер: задаются юзеры, что могут зайти через этот слушатель
+      KAFKA_LISTENER_NAME_HOST_PLAIN_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_ADMIN_USERNAME:-admin}" password="${KAFKA_ADMIN_PASSWORD:-admin}" user_${KAFKA_ADMIN_USERNAME:-admin}="${KAFKA_ADMIN_PASSWORD:-admin}"; # аналогично, но для слушателя хост
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
   service:
     container_name: cert_backend
     image: backend:latest
@@ -43,6 +67,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      kafka:
+        condition: service_started
     env_file:
       - .env
     environment:
@@ -53,6 +79,9 @@ services:
       - SPRING_DATA_REDIS_PORT=${REDIS_PORT:-6379}
       - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD:-redis}
       - SERVER_PORT=9090
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+
+
 volumes:
   postgres_data:
   redis_data:

@@ -22,6 +22,27 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:redis}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    properties:
+      security.protocol: SASL_PLAINTEXT
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: >-
+        org.apache.kafka.common.security.plain.PlainLoginModule required
+        username="${KAFKA_ADMIN_USERNAME:admin}"
+        password="${KAFKA_ADMIN_PASSWORD:admin}";
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP:mail-service}
+
+email:
+  from: ${EMAIL_FROM:onboarding@resend.dev} # нужно задать в env
+
+resend:
+  api-key: ${RESEND_API_KEY} # нужно задать в env
+
+app:
+  name: ${APP_NAME:Certification Server}
+  url: ${APP_URL:http://localhost:8080}
 
 jwt:
   secret: ${JWT_SECRET}

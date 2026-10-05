@@ -2,17 +2,14 @@ package ru.cert.certificationserver.service;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
 import ru.cert.certificationserver.model.entity.UserEntity;
-import ru.cert.certificationserver.model.entity.UserRoleEntity;
 import ru.cert.certificationserver.model.enums.UserSystemStatusNameEnum;
 import ru.cert.certificationserver.model.security.CachedAuthUser;
-import ru.cert.certificationserver.repository.redis.UserRepository;
+import ru.cert.certificationserver.repository.UserRepository;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.stream.Collectors;
 
 // Кэш auth-снимка пользователя (Caffeine, in-memory): JwtAuthenticationFilter грузил
 // findByIdWithRolesAndStreamId на КАЖДЫЙ запрос - теперь только на промах/по TTL. Один бэкенд-инстанс

@@ -79,7 +79,7 @@ public class GlobalExceptionHandler {
         ValidationCodeEnum errorEnum = switch (springCode != null ? springCode : "") {
           case "NotBlank", "NotNull", "NotEmpty" -> ValidationCodeEnum.REQUIRED_FIELD;
           case "Size", "Length" -> ValidationCodeEnum.INVALID_LENGTH;
-          case "Email", "Pattern" -> ValidationCodeEnum.INVALID_FORMAT;
+          case "Email", "Pattern", "JmailEmail" -> ValidationCodeEnum.INVALID_FORMAT;
           // Отдельно от INVALID_FORMAT: правило требует спецсимвол, и по общему коду фронт не мог
           // объяснить, чем именно плох пароль (EZHSH-329).
           case "StrongPassword" -> ValidationCodeEnum.WEAK_PASSWORD;
@@ -289,6 +289,7 @@ public class GlobalExceptionHandler {
       case ALREADY_ACTIVATED -> "Account already activated.";
       case TOKEN_EXPIRED -> "Token expired.";
       case ACCOUNT_INACTIVE -> "Account deactivated.";
+      case EMAIL_ALREADY_EXISTS -> "Email already exists.";
     };
   }
 

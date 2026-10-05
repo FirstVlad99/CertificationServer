@@ -3,7 +3,7 @@ post:
   summary: Регистрация в системе
   description: |
     Регистрирует пользователя в системе, если учетной записи с таким email нет. 
-    Бэкенд генерирует и возвращает access и refresh токены.
+    Бэкенд только создает учетную запись пользователя с ролью CUSTOMER, статусом PENDING_CONFIRMATION.
   tags:
     - auth
   security: []
@@ -14,15 +14,11 @@ post:
         schema:
           $ref: '../../../components/schemas.yaml#/schemas/RegisterRequest'
   responses:
-    '200':
-      description: Успешный вход. Токены переданы в теле ответа.
-      content:
-        application/json:
-          schema:
-            $ref: '../../../components/schemas.yaml#/schemas/TokensMobileResponse'
+    '201':
+      description: Аккаунт пользователя создан.
     '401':
       $ref: '../../../components/responses.yaml#/UnauthorizedError'
     '409':
       $ref: '../../../components/responses.yaml#/ConflictError'
-    '422':
+    '400':
       $ref: '../../../components/responses.yaml#/BadRequestError'

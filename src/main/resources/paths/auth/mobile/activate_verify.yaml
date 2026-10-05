@@ -1,0 +1,19 @@
+get:
+  operationId: verifyActivationToken
+  summary: Проверка валидности токена активации аккаунта
+  description: Позволяет клиенту проверить токен из пригласительного письма до того, как показывать домашний экран приложения.
+  tags:
+    - auth
+  security: []
+  parameters:
+    - name: X-Activation-Code
+      in: header
+      required: true
+      description: Код активации из письма с подтверждением аккаунта на почте
+      schema:
+        type: string
+  responses:
+    '204':
+      description: Код валиден, можно рендерить домашний экран пользователя.
+    '400':
+      $ref: '../../../components/responses.yaml#/BadRequestError'

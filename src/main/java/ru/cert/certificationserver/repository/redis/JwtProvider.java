@@ -28,10 +28,11 @@ public class JwtProvider {
         .compact();
   }
 
-  public String generateRefresh(UserEntity user, String sessionId) {
+  public String generateRefresh(UserEntity user, String sessionId, String activeRole) {
     return Jwts.builder()
         .subject(user.getId().toString())
         .claim("sid", sessionId)
+        .claim("role", activeRole)
         .issuedAt(new Date())
         .expiration(Date.from(Instant.now().plus(30, ChronoUnit.DAYS)))
         .signWith(getKey())

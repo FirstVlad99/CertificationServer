@@ -17,6 +17,7 @@
     <properties>
         <java.version>25</java.version>
         <jjwt.version>0.13.0</jjwt.version>
+        <resend.version>4.13.0</resend.version>
     </properties>
     <dependencies>
         <dependency>
@@ -62,6 +63,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.resend</groupId>
+            <artifactId>resend-java</artifactId>
+            <version>${resend.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -196,6 +202,11 @@
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sanctionco.jmail</groupId>
+            <artifactId>jmail</artifactId>
+            <version>2.2.2</version>
         </dependency>
     </dependencies>
 
