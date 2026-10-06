@@ -10,7 +10,9 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import ru.cert.certificationserver.config.properties.AppProperties;
 import ru.cert.certificationserver.config.properties.EmailProperties;
+import ru.cert.certificationserver.config.properties.TtlProperties;
 import ru.cert.certificationserver.kafka.email.MailGateway;
+import ru.cert.certificationserver.repository.redis.RedisSessionStore;
 
 @Service
 public class ResendMailGateway implements MailGateway {
@@ -18,29 +20,31 @@ public class ResendMailGateway implements MailGateway {
   private final TemplateEngine templateEngine;
   private final EmailProperties emailProperties;
   private final AppProperties appProperties;
+  private final TtlProperties ttlProperties;
   private static final Logger log = LoggerFactory.getLogger(ResendMailGateway.class);
 
-  public ResendMailGateway(Resend resend, TemplateEngine templateEngine, EmailProperties emailProperties, AppProperties appProperties) {
+  public ResendMailGateway(Resend resend, TemplateEngine templateEngine, EmailProperties emailProperties, AppProperties appProperties, TtlProperties ttlProperties) {
     this.resend = resend;
     this.templateEngine = templateEngine;
     this.emailProperties = emailProperties;
     this.appProperties = appProperties;
+    this.ttlProperties = ttlProperties;
   }
 
-
   @Override
-  public void sendPasswordReset(String to, String token) {
+  public void sendPasswordReset(String to, String code) {
     try {
       Context context = new Context();
       context.setVariable("appName", appProperties.name());
-      context.setVariable("resetLink", appProperties.url() + "/reset-password?token=" + token);
+      context.setVariable("resetCode", code);
+      context.setVariable("expirationMinutes", ttlProperties.passwordReset().toMinutes());
 
       String htmlContent = templateEngine.process("password_reset", context);
 
       CreateEmailOptions options = CreateEmailOptions.builder()
           .from(emailProperties.from())
           .to(to)
-          .subject(appProperties.name() + ": Password Reset Request")
+          .subject(appProperties.name() + ": Сброс пароля")
           .html(htmlContent)
           .build();
 
@@ -51,18 +55,19 @@ public class ResendMailGateway implements MailGateway {
   }
 
   @Override
-  public void sendAccountActivation(String to, String token) {
+  public void sendAccountActivation(String to, String code) {
     try {
       Context context = new Context();
       context.setVariable("appName", appProperties.name());
-      context.setVariable("activationLink", appProperties.url() + "/activate?token=" + token);
+      context.setVariable("confirmationCode", code);
+      context.setVariable("expirationMinutes", ttlProperties.activation().toMinutes());
 
       String htmlContent = templateEngine.process("account_activation", context);
 
       CreateEmailOptions options = CreateEmailOptions.builder()
           .from(emailProperties.from())
           .to(to)
-          .subject(appProperties.name() + ": Activate Your Account")
+          .subject(appProperties.name() + ": Подтверждение email ящика")
           .html(htmlContent)
           .build();
 

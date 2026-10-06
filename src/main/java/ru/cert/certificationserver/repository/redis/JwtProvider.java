@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.cert.certificationserver.config.properties.JwtProperties;
 import ru.cert.certificationserver.model.entity.UserEntity;
 
 import javax.crypto.SecretKey;
@@ -14,8 +15,11 @@ import java.util.Date;
 
 @Component
 public class JwtProvider {
-  @Value("${jwt.secret}")
-  private String secret;
+  private final JwtProperties jwtProperties;
+
+  public JwtProvider(JwtProperties jwtProperties) {
+    this.jwtProperties = jwtProperties;
+  }
 
   public String generateAccess(UserEntity user, String sessionId, String activeRole) {
     return Jwts.builder()
@@ -48,6 +52,6 @@ public class JwtProvider {
   }
 
   private SecretKey getKey() {
-    return Keys.hmacShaKeyFor(secret.getBytes());
+    return Keys.hmacShaKeyFor(jwtProperties.secret().getBytes());
   }
 }

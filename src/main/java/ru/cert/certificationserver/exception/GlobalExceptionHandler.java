@@ -2,6 +2,7 @@ package ru.cert.certificationserver.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -13,11 +14,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import ru.cert.certificationserver.config.properties.MultipartProperties;
 import ru.cert.certificationserver.dto.error.response.ErrorResponse;
 import ru.cert.certificationserver.dto.error.response.FieldsErrorResponse;
 import ru.cert.certificationserver.model.enums.AuthErrorEnum;
@@ -31,8 +34,11 @@ import java.util.regex.Pattern;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-  @Value("${spring.servlet.multipart.max-file-size:10MB}")
-  private DataSize maxFileSize;
+  private final MultipartProperties multipartProperties;
+
+  public GlobalExceptionHandler(MultipartProperties multipartProperties) {
+    this.multipartProperties = multipartProperties;
+  }
 
   @ExceptionHandler(AuthException.class)
   public ResponseEntity<ErrorResponse> handleAuthException(AuthException ex) {
@@ -76,15 +82,7 @@ public class GlobalExceptionHandler {
         String springCode = error.getCode(); // Получаем имя аннотации (NotBlank, Size)
 
         // Маппим имя аннотации на подходящие константы из ErrorCodeEnum
-        ValidationCodeEnum errorEnum = switch (springCode != null ? springCode : "") {
-          case "NotBlank", "NotNull", "NotEmpty" -> ValidationCodeEnum.REQUIRED_FIELD;
-          case "Size", "Length" -> ValidationCodeEnum.INVALID_LENGTH;
-          case "Email", "Pattern", "JmailEmail" -> ValidationCodeEnum.INVALID_FORMAT;
-          // Отдельно от INVALID_FORMAT: правило требует спецсимвол, и по общему коду фронт не мог
-          // объяснить, чем именно плох пароль (EZHSH-329).
-          case "StrongPassword" -> ValidationCodeEnum.WEAK_PASSWORD;
-          default -> ValidationCodeEnum.VALIDATION_FAILED;
-        };
+        ValidationCodeEnum errorEnum = mapSpringCodeToValidationCode(springCode);
 
         errors.put(fieldName, errorEnum);
       }
@@ -95,6 +93,32 @@ public class GlobalExceptionHandler {
         errors
     );
 
+    return ResponseEntity.status(toHttpStatus(errorBody.getCode())).body(errorBody);
+  }
+
+  @ExceptionHandler(HandlerMethodValidationException.class)
+  public ResponseEntity<FieldsErrorResponse> handleHandlerMethodValidation(
+      HandlerMethodValidationException ex
+  ) {
+    Map<String, ValidationCodeEnum> errors = new HashMap<>();
+
+    ex.getParameterValidationResults().forEach(result -> {
+      String paramName = result.getMethodParameter().getParameterName();
+      if (paramName == null) {
+        paramName = "parameter";
+      }
+      for (var error : result.getResolvableErrors()) {
+        if (error instanceof DefaultMessageSourceResolvable resolvable) {
+          String springCode = resolvable.getCode();
+          errors.put(paramName, mapSpringCodeToValidationCode(springCode));
+        }
+      }
+    });
+
+    FieldsErrorResponse errorBody = new FieldsErrorResponse(
+        "Input data failed validation.",
+        errors
+    );
     return ResponseEntity.status(toHttpStatus(errorBody.getCode())).body(errorBody);
   }
 
@@ -228,7 +252,7 @@ public class GlobalExceptionHandler {
 
     ErrorResponse errorBody = new ErrorResponse(
         ErrorCodeEnum.CONTENT_TOO_LARGE,
-        "The file size exceeds the limit: " + maxFileSize + "MB"
+        "The file size exceeds the limit: " + multipartProperties.maxFileSize() + "MB"
     );
 
     return ResponseEntity
@@ -304,6 +328,16 @@ public class GlobalExceptionHandler {
       case CONFLICT -> HttpStatus.CONFLICT;
       case CONTENT_TOO_LARGE -> HttpStatus.CONTENT_TOO_LARGE;
       case REQUEST_HEADER_FIELDS_TOO_LARGE -> HttpStatus.REQUEST_HEADER_FIELDS_TOO_LARGE;
+    };
+  }
+
+  private static ValidationCodeEnum mapSpringCodeToValidationCode(String springCode) {
+    return switch (springCode != null ? springCode : "") {
+      case "NotBlank", "NotNull", "NotEmpty" -> ValidationCodeEnum.REQUIRED_FIELD;
+      case "Size", "Length" -> ValidationCodeEnum.INVALID_LENGTH;
+      case "Email", "Pattern", "JmailEmail" -> ValidationCodeEnum.INVALID_FORMAT;
+      case "StrongPassword" -> ValidationCodeEnum.WEAK_PASSWORD;
+      default -> ValidationCodeEnum.VALIDATION_FAILED;
     };
   }
 }

@@ -23,6 +23,9 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:redis}
   kafka:
+    mail:
+      topic: ${KAFKA_MAIL_SEND_TOPIC}
+      group-id: ${KAFKA_MAIL_SEND_CONSUMER_GROUP}
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     properties:
       security.protocol: SASL_PLAINTEXT
@@ -32,13 +35,17 @@ spring:
         username="${KAFKA_ADMIN_USERNAME:admin}"
         password="${KAFKA_ADMIN_PASSWORD:admin}";
     consumer:
-      group-id: ${KAFKA_CONSUMER_GROUP:mail-service}
+      group-id: ${KAFKA_MAIL_SEND_CONSUMER_GROUP:mail-service}
 
 email:
-  from: ${EMAIL_FROM:onboarding@resend.dev} # нужно задать в env
+  from: ${EMAIL_FROM:onboarding@resend.dev}
 
+ttl:
+  activation: 15m
+  password-reset: 15m
+  session: 30d
 resend:
-  api-key: ${RESEND_API_KEY} # нужно задать в env
+  api-key: ${RESEND_API_KEY}
 
 app:
   name: ${APP_NAME:Certification Server}
@@ -51,5 +58,8 @@ logging:
   level:
     org.springframework.security: ${LOG_LEVEL_SECURITY:INFO}
     org.springframework.security.web: ${LOG_LEVEL_SECURITY_WEB:INFO}
+    io.lettuce.core: DEBUG
+    io.lettuce.core.protocol: DEBUG
+    org.springframework.data.redis: DEBUG
     org.springframework.web: ${LOG_LEVEL_WEB:INFO}
     ru.cert.certificationserver: ${LOG_LEVEL_APP:DEBUG}

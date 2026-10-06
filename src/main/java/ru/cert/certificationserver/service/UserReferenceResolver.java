@@ -16,7 +16,7 @@ public class UserReferenceResolver {
   }
 
   public UserSystemStatusEntity userSystemStatus(UserSystemStatusNameEnum status) {
-    return userSystemStatusRepository.findByName(status.toString())
+    return userSystemStatusRepository.findByName(status)
         .orElseThrow(() ->
             new EntityNotFoundException("User system status not found: " + status)
         );

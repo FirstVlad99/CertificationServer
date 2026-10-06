@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Подтверждение email</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+<div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+    <h2 style="color: #333;" th:text="${appName}">App Name</h2>
+    <p style="color: #555; font-size: 16px; line-height: 1.6;">
+        Здравствуйте! Чтобы подтвердить ваш email-адрес, введите следующий код
+        на странице подтверждения:
+    </p>
+    <div style="text-align: center; margin: 30px 0;">
+        <div style="display: inline-block;
+                    background-color: #ffffff;
+                    border: 2px solid #7c3aed;
+                    border-radius: 8px;
+                    padding: 20px 40px;
+                    letter-spacing: 8px;">
+            <span th:text="${confirmationCode}"
+                  style="font-size: 36px;
+                         font-weight: bold;
+                         color: #7c3aed;
+                         font-family: 'Courier New', monospace;">
+                123456
+            </span>
+        </div>
+    </div>
+    <p style="color: #888; font-size: 14px;">
+        Код действителен в течение
+        <span th:text="${expirationMinutes}">15</span> минут.
+    </p>
+    <p style="color: #888; font-size: 14px;">
+        Если вы не запрашивали подтверждение email, просто проигнорируйте это письмо.
+    </p>
+    <hr style="border: 1px solid #eee; margin: 20px 0;">
+    <p style="color: #999; font-size: 12px; text-align: center;">
+        &copy; 2026 <span th:text="${appName}">App</span>. Все права защищены.
+    </p>
+</div>
+</body>
+</html>

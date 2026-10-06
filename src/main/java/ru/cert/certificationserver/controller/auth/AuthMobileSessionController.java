@@ -1,6 +1,7 @@
 package ru.cert.certificationserver.controller.auth;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -75,10 +76,10 @@ public class AuthMobileSessionController {
   }
 
   @GetMapping("/activate/verify")
-  public ResponseEntity<Void> verifyActivationToken(
-      @RequestHeader(value = AuthHttpHeaders.ACTIVATE_CODE, required = false) String code
+  public ResponseEntity<Void> verifyActivationCode(
+      @Valid @RequestHeader(value = AuthHttpHeaders.ACTIVATE_CODE) @NotBlank(message="X-Activation-Code must not be blank") String code
   ) {
-    authService.verifyActivationToken(code);
+    authService.verifyActivationCode(code);
     return ResponseEntity.noContent().build();
   }
 
@@ -99,10 +100,10 @@ public class AuthMobileSessionController {
   }
 
   @GetMapping("/reset-password/verify")
-  public ResponseEntity<Void> verifyResetToken(
-      @RequestHeader(value = AuthHttpHeaders.RESET_PASSWORD_CODE, required = false) String code
+  public ResponseEntity<Void> verifyResetCode(
+      @Valid @RequestHeader(value = AuthHttpHeaders.RESET_PASSWORD_CODE) @NotBlank(message="X-Reset-Password-Code must not be blank") String code
   ) {
-    authService.verifyResetToken(code);
+    authService.verifyResetCode(code);
     return ResponseEntity.noContent().build();
   }
 }

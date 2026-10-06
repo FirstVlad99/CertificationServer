@@ -695,7 +695,7 @@ class AuthSessionServiceTest {
 
   @Test
   @DisplayName("verifyActivationToken: должен пройти валидацию")
-  void verifyActivationToken_shouldPass() {
+  void verifyActivationCode_shouldPass() {
     user.setUserStatus(TestUserStatuses.pendingConfirmation());
 
     when(sessionStore.findUserIdByActivationCode("code"))
@@ -705,51 +705,51 @@ class AuthSessionServiceTest {
         .thenReturn(Optional.of(user));
 
     assertDoesNotThrow(
-        () -> authService.verifyActivationToken("code")
+        () -> authService.verifyActivationCode("code")
     );
   }
 
   @Test
   @DisplayName("verifyActivationToken: должен выбросить ошибку если код истек")
-  void verifyActivationToken_shouldThrowIfExpired() {
+  void verifyActivationCode_shouldThrowIfExpired() {
     when(sessionStore.findUserIdByActivationCode("code"))
         .thenReturn(Optional.empty());
 
     assertThrows(AuthException.class,
-        () -> authService.verifyActivationToken("code"));
+        () -> authService.verifyActivationCode("code"));
   }
 
   @Test
   @DisplayName("verifyActivationToken: должен выбросить ошибку если пользователь не найден по коду")
-  void verifyActivationToken_shouldThrowIfUserNotFound() {
+  void verifyActivationCode_shouldThrowIfUserNotFound() {
     when(sessionStore.findUserIdByActivationCode("code"))
         .thenReturn(Optional.of(1L));
     when(userRepository.findById(1L))
         .thenReturn(Optional.empty());
 
     assertThrows(EntityNotFoundException.class,
-        () -> authService.verifyActivationToken("code"));
+        () -> authService.verifyActivationCode("code"));
   }
 
   @Test
   @DisplayName("verifyResetToken: должен пройти валидацию")
-  void verifyResetToken_shouldPass() {
+  void verifyResetCode_shouldPass() {
     when(sessionStore.findUserIdByResetCode("code"))
         .thenReturn(Optional.of(1L));
 
     assertDoesNotThrow(
-        () -> authService.verifyResetToken("code")
+        () -> authService.verifyResetCode("code")
     );
   }
 
   @Test
   @DisplayName("verifyResetToken: должен выбросить ошибку если код истек")
-  void verifyResetToken_shouldThrowIfExpired() {
+  void verifyResetCode_shouldThrowIfExpired() {
     when(sessionStore.findUserIdByResetCode("code"))
         .thenReturn(Optional.empty());
 
     assertThrows(AuthException.class,
-        () -> authService.verifyResetToken("code"));
+        () -> authService.verifyResetCode("code"));
   }
 
   @Test

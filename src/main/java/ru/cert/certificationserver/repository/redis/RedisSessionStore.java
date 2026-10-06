@@ -2,9 +2,9 @@ package ru.cert.certificationserver.repository.redis;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
+import ru.cert.certificationserver.config.properties.TtlProperties;
 import ru.cert.certificationserver.model.redis.AuthSession;
 
-import java.time.Duration;
 import java.util.Optional;
 import java.util.Set;
 
@@ -19,13 +19,12 @@ public class RedisSessionStore {
   private final static String RESET_PASSWORD_CODE_KEY = "reset:code:";
   private final static String RESET_PASSWORD_USER_KEY = "reset:user:";
 
-  private final static Duration ACTIVATION_TTL = Duration.ofMinutes(15);
-  private final static Duration RESET_PASSWORD_TTL = Duration.ofMinutes(15);
-  private static final Duration SESSION_TTL = Duration.ofDays(30);
+  private final TtlProperties ttlProperties;
 
-  public RedisSessionStore(RedisTemplate<String, Object> redisTemplate, RedisTemplate<String, String> stringRedisTemplate) {
+  public RedisSessionStore(RedisTemplate<String, Object> redisTemplate, RedisTemplate<String, String> stringRedisTemplate, TtlProperties ttlProperties) {
     this.redisTemplate = redisTemplate;
     this.stringRedisTemplate = stringRedisTemplate;
+    this.ttlProperties = ttlProperties;
   }
 
   private String sessionKey(Long userId, String sessionId) {
@@ -40,7 +39,7 @@ public class RedisSessionStore {
     redisTemplate.opsForValue().set(
         sessionKey(userId, session.getSessionId()),
         session,
-        SESSION_TTL
+        ttlProperties.session()
     );
 
     stringRedisTemplate.opsForSet().add(
@@ -54,14 +53,14 @@ public class RedisSessionStore {
     String userKey = ACTIVATION_USER_KEY + userId;
 
     Boolean saved = stringRedisTemplate.opsForValue()
-        .setIfAbsent(codeKey, userId.toString(), ACTIVATION_TTL);
+        .setIfAbsent(codeKey, userId.toString(), ttlProperties.activation());
 
     if (!Boolean.TRUE.equals(saved)) {
       return false;
     }
 
     stringRedisTemplate.opsForValue()
-        .set(userKey, code, ACTIVATION_TTL);
+        .set(userKey, code, ttlProperties.activation());
     return true;
   }
 
@@ -77,7 +76,7 @@ public class RedisSessionStore {
 
     // Cохраняю новый прямой ключ
     Boolean saved = stringRedisTemplate.opsForValue()
-        .setIfAbsent(codeKey, userId.toString(), RESET_PASSWORD_TTL);
+        .setIfAbsent(codeKey, userId.toString(), ttlProperties.passwordReset());
 
     if (!Boolean.TRUE.equals(saved)) {
       return false;
@@ -85,7 +84,7 @@ public class RedisSessionStore {
 
     // Обновляю обратный индекс
     stringRedisTemplate.opsForValue()
-        .set(userKey, code, RESET_PASSWORD_TTL);
+        .set(userKey, code, ttlProperties.passwordReset());
     return true;
   }
 

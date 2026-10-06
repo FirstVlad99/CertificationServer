@@ -71,6 +71,7 @@ public class AuthSessionService {
     eventPublisher.publishEvent(new ActivationEmailEvent(normalizedEmail, code));
   }
 
+  @Transactional(readOnly = true)
   public void resendActivationCode(ResendActivationRequest request) {
     String normalizedEmail = normalizeEmailOrThrow(request.email());
     userRepository.findByEmail(
@@ -208,6 +209,7 @@ public class AuthSessionService {
     return createSession(user, userAgent, request.getRole());
   }
 
+  @Transactional
   public void forgotPassword(ForgotPasswordRequest request) {
     String normalizedEmail = normalizeEmailOrThrow(request.email());
     userRepository.findByEmail(
@@ -242,7 +244,7 @@ public class AuthSessionService {
     terminateAllSessions(userId);
   }
 
-  public void verifyActivationToken(String code) {
+  public void verifyActivationCode(String code) {
     Long userId = sessionStore.findUserIdByActivationCode(code)
         .orElseThrow(() ->
             new AuthException(
@@ -262,7 +264,7 @@ public class AuthSessionService {
     }
   }
 
-  public void verifyResetToken(String code) {
+  public void verifyResetCode(String code) {
     sessionStore.findUserIdByResetCode(code)
         .orElseThrow(() ->
             new AuthException(
