@@ -8,6 +8,7 @@ public class AuthSession {
   private Instant createdAt;
   private Instant lastUsedAt;
   private String userAgent;
+  private String activeRole;
 
   public static Builder builder() {
     return new Builder();
@@ -19,6 +20,7 @@ public class AuthSession {
     private Instant createdAt;
     private Instant lastUsedAt;
     private String userAgent;
+    private String activeRole;
 
     public Builder setSessionId(String sessionId) {
       this.sessionId = sessionId;
@@ -45,17 +47,23 @@ public class AuthSession {
       return this;
     }
 
+    public Builder setActiveRole(String activeRole) {
+      this.activeRole = activeRole;
+      return this;
+    }
+
     public AuthSession build() {
-      return new AuthSession(sessionId, refreshHash, createdAt, lastUsedAt, userAgent);
+      return new AuthSession(sessionId, refreshHash, createdAt, lastUsedAt, userAgent, activeRole);
     }
   }
 
-  public AuthSession(String sessionId, String refreshHash, Instant createdAt, Instant lastUsedAt, String userAgent) {
+  public AuthSession(String sessionId, String refreshHash, Instant createdAt, Instant lastUsedAt, String userAgent, String activeRole) {
     this.sessionId = sessionId;
     this.refreshHash = refreshHash;
     this.createdAt = createdAt;
     this.lastUsedAt = lastUsedAt;
     this.userAgent = userAgent;
+    this.activeRole = activeRole;
   }
 
   public String getSessionId() {
@@ -96,6 +104,14 @@ public class AuthSession {
 
   public void setUserAgent(String userAgent) {
     this.userAgent = userAgent;
+  }
+
+  public String getActiveRole() {
+    return activeRole;
+  }
+
+  public void setActiveRole(String userAgent) {
+    this.activeRole = activeRole;
   }
 }
 

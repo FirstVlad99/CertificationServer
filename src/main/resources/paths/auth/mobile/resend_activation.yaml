@@ -1,0 +1,25 @@
+post:
+  operationId: resendActivation
+  summary: Активация аккаунта нового пользователя (подтверждение email)
+  description: |
+    Повторно отправляет код активации на email пользователя, находящегося
+    в статусе PENDING_CONFIRMATION. Используется, если предыдущее письмо
+    не дошло или код истёк.
+    Если пользователь не найден или уже активирован - ответ всё равно
+    успешный (204), чтобы не раскрывать существование аккаунта.
+  tags:
+    - auth
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../components/schemas.yaml#/schemas/ResendActivationRequest'
+  responses:
+    '204':
+      description: |
+        Запрос принят. Если пользователь существует и не активирован,
+        код активации будет отправлен на указанный email.
+    '400':
+      $ref: '../../../components/responses.yaml#/BadRequestError'

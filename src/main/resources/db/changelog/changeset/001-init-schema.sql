@@ -11,7 +11,7 @@ CREATE TABLE user_system_statuses (
   id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   name VARCHAR(20) NOT NULL UNIQUE
 );
-INSERT INTO user_system_statuses (name) VALUES ('ACTIVE'), ('INACTIVE'), ('BANNED');
+INSERT INTO user_system_statuses (name) VALUES ('ACTIVE'), ('INACTIVE'), ('BANNED'),('PENDING_CONFIRMATION');
 
 CREATE TABLE person_types(
                              id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -22,7 +22,7 @@ INSERT INTO person_types (name) VALUES ('INDIVIDUAL'),('LEGAL'),('SOLE'); -- ф�
 CREATE TABLE users(
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     -- ник, пример : @id000002
-    username VARCHAR(20) NOT NULL UNIQUE,
+    username VARCHAR(20) UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     name VARCHAR(50),
     surname VARCHAR(50),
@@ -32,7 +32,7 @@ CREATE TABLE users(
     photo_id INT,
     site_url VARCHAR(500),
     site_label VARCHAR(20),
-    system_status_id INT NOT NULL DEFAULT 1 REFERENCES user_system_statuses(id),
+    system_status_id INT NOT NULL DEFAULT 4 REFERENCES user_system_statuses(id),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

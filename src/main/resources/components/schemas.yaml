@@ -64,3 +64,47 @@ schemas:
         type: string
         description: Долгоживущий токен. Используется для обновления пары (access_token,refresh_token) при истечении access_token
         example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM1MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+
+  ActivateAccountRequest:
+    type: object
+    required: [ code ]
+    properties:
+      code:
+        type: string
+        description: Код активации
+
+  ResetPasswordRequest:
+    type: object
+    required: [ code, new_password ]
+    properties:
+      code:
+        type: string
+        description: Одноразовый код, полученный из письма.
+        example: "6676"
+      new_password:
+        type: string
+        format: password
+        description: >
+          Новый пароль пользователя. Обязательны хотя бы одна латинская буква, хотя бы одна цифра
+          и хотя бы один спецсимвол; другие символы, включая кириллицу и пробел, не принимаются.
+          Нарушение правила - `WEAK_PASSWORD` в `fields`, нарушение длины - `INVALID_LENGTH`.
+        minLength: 8
+        example: "SecretPassword2026!"
+
+  ForgotPasswordRequest:
+    type: object
+    required: [ email ]
+    properties:
+      email:
+        type: string
+        format: email
+        example: vladislw.pankov@gmail.com
+
+  ResendActivationRequest:
+    type: object
+    required: [ email ]
+    properties:
+      email:
+        type: string
+        format: email
+        example: vladislw.pankov@gmail.com
