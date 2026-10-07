@@ -8,8 +8,8 @@ public class JmailEmailValidator implements ConstraintValidator<JmailEmail, Stri
   @Override
   public boolean isValid(String value, ConstraintValidatorContext ctx) {
     if (value == null || value.isBlank()) {
-      return true; // null/blank — забота @NotBlank
+      return true;
     }
-    return JMail.isValid(value);
+    return JMail.strictValidator().isValid(value);
   }
 }
