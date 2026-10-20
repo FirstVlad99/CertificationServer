@@ -68,7 +68,7 @@ public class AuthMobileSessionController {
   }
 
   @PostMapping("/activate/resend")
-  public ResponseEntity<Void> activateAccount(
+  public ResponseEntity<Void> resendActivate(
       @Valid @RequestBody ResendActivationRequest request
   ) {
     authService.resendActivationCode(request);
