@@ -1,0 +1,25 @@
+post:
+  operationId: activateAccount
+  summary: Активация аккаунта нового пользователя (подтверждение email)
+  description: |
+    Принимает одноразовый код активации.
+    Переводит статус аккаунта в "активен". После успешной активации бэкенд автоматически 
+    генерирует сессию и отправляет access и refresh токены.
+  tags:
+    - auth
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../components/schemas.yaml#/schemas/ActivateAccountRequest'
+  responses:
+    '200':
+      description: Аккаунт успешно активирован. Токены переданы в теле ответа.
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas.yaml#/schemas/TokensMobileResponse'
+    '400':
+      $ref: '../../../components/responses.yaml#/BadRequestError'

@@ -2,8 +2,10 @@ package ru.cert.certificationserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication
+@ConfigurationPropertiesScan
 public class CertificationServerApplication {
 
   public static void main(String[] args) {
